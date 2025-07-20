@@ -1,39 +1,86 @@
+/* eslint-disable no-console */
+import { excludeField } from "../../constants";
+import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
-
 
 const createTour = async (payload: ITour) => {
   const existingTour = await Tour.findOne({ title: payload.title });
   if (existingTour) {
     throw new Error("A tour with this title already exists.");
   }
+
+  // const baseSlug = payload.title.toLowerCase().split(" ").join("-")
+  // let slug = `${baseSlug}`
+
+  // let counter = 0;
+  // while (await Tour.exists({ slug })) {
+  //     slug = `${slug}-${counter++}` // dhaka-division-2
+  // }
+
+  // payload.slug = slug;
+
   const tour = await Tour.create(payload);
 
   return tour;
 };
 
-// const getAllTours = async (query: Record<string, string>) => {
-const getAllTours = async () => {
-//   const queryBuilder = new QueryBuilder(Tour.find(), query);
+const getAllTours = async (query: Record<string, string>) => {
+  console.log(query);
+   const filter = query;
+  const searchTerm = query.searchTerm || "";
+  const sort = query.sort || "-createdAt";
 
-//   const tours = await queryBuilder
-//     .search(tourSearchableFields)
-//     .filter()
-//     .sort()
-//     .fields()
-//     .paginate();
+  //field filtering
+  const fields = query.fields.split(",").join(" ") || "";
+
+  // delete filter["searchTerm"]
+  // delete filter["sort"]
+
+  for (const field of excludeField){
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete filter[field];
+  }
+  // const tourSearchableFields = ["location", "description", "title"];
+  // const searchArray = tourSearchableFields.map((field) => ({
+  //   [field]: { $regex: searchTerm, $options: "i" },
+  // }));
+
+   const searchQuery = {
+    // title: {$regex : searchTerm, $options : "i"}
+
+    $or: tourSearchableFields.map((field) => ({
+    [field]: { $regex: searchTerm, $options: "i" },
+  }))
+  
+    
+   }
+
+ 
+  // const getAllTours = async () => {
+  //   const queryBuilder = new QueryBuilder(Tour.find(), query);
+
+  //   const tours = await queryBuilder
+  //     .search(tourSearchableFields)
+  //     .filter()
+  //     .sort()
+  //     .fields()
+  //     .paginate();
 
   // const meta = await queryBuilder.getMeta()
 
-//   const [data, meta] = await Promise.all([
-//     tours.build(),
-//     queryBuilder.getMeta(),
-//   ]);
+  //   const [data, meta] = await Promise.all([
+  //     tours.build(),
+  //     queryBuilder.getMeta(),
+  //   ]);
 
-const tours = await Tour.find({});
+  const tours = await Tour.find(searchQuery)
+    .find(filter)
+    .sort(sort)
+    .select(fields);
 
   return {
-    data: tours
+    data: tours,
     // data,
     // meta,
   };
@@ -77,11 +124,9 @@ const createTourType = async (payload: ITourType) => {
   return await TourType.create({ name });
 };
 
-
 const getAllTourTypes = async () => {
   return await TourType.find();
 };
-
 
 const updateTourType = async (id: string, payload: ITourType) => {
   const existingTourType = await TourType.findById(id);
@@ -94,7 +139,6 @@ const updateTourType = async (id: string, payload: ITourType) => {
   });
   return updatedTourType;
 };
-
 
 const deleteTourType = async (id: string) => {
   const existingTourType = await TourType.findById(id);
