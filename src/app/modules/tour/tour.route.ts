@@ -22,6 +22,7 @@ router.post(
 router.patch(
   "/tour-types/:id",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  multerUpload.array("files"),
   validateRequest(createTourTypeZodSchema),
   TourController.updateTourType
 );
