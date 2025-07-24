@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { UserController } from "./user.controller";
 import { createUserZodSchema, updateUserZodSchema } from "./user.validation";
 import { validateRequest } from "../../middlewares/validateRequest";
