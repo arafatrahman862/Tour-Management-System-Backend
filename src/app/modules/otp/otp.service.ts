@@ -57,7 +57,7 @@ const verifyOTP = async (email: string, otp: string) => {
   if (user.isVerified) {
     throw new AppError(401, "You are already verified");
   }
- 
+
   const redisKey = `otp:${email}`;
   const savedOtp = await redisClient.get(redisKey);
 
