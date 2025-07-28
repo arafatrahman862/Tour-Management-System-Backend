@@ -1,6 +1,6 @@
 // User - Booking(Pending) -> Payment (Unpaid) -> SSLCommerz -> Booking update = confirm -> Payment update = Paid
 
-import { Types } from "mongoose";
+import { Date, Types } from "mongoose";
 
 export enum BOOKING_STATUS {
   PENDING = "PENDING",
@@ -15,4 +15,5 @@ export interface IBooking {
   payment?: Types.ObjectId;
   guestCount: number;
   status: BOOKING_STATUS;
+  createdAt?: Date;
 }
