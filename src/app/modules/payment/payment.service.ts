@@ -14,6 +14,7 @@ import { PAYMENT_STATUS } from "./payment.interface";
 import { Payment } from "./payment.model";
 import httpStatus from "http-status-codes";
 
+
 const initPayment = async (bookingId: string) => {
   const payment = await Payment.findOne({ booking: bookingId });
 
